@@ -4,10 +4,10 @@ sealed class SantaListEvent {
   const SantaListEvent();
 }
 
-class ChildAdded extends SantaListEvent {
+class SantaChildAdded extends SantaListEvent {
   final ChildInfo childInfo;
 
-  const ChildAdded(
+  const SantaChildAdded(
     this.childInfo,
   );
 }

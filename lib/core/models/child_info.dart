@@ -1,8 +1,9 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:santa_list/core/enums/child_type.dart';
 
 class ChildInfo {
   final String name;
-  final String country;
+  final Country country;
   final ChildType childType;
 
   ChildInfo({
