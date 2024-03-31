@@ -7,44 +7,29 @@ import 'package:santa_list/feature/santa_list/bloc/santa_list_bloc.dart';
 import 'package:santa_list/shared/shared.dart';
 import 'package:santa_list/shared/utils.dart';
 import 'package:santa_list/shared/widgets/radio_item.dart';
+import 'package:uuid/uuid.dart';
 
-class AddChildpage extends StatefulWidget {
-  const AddChildpage({super.key});
-
-  @override
-  State<AddChildpage> createState() => _AddChildpageState();
-}
-
-class _AddChildpageState extends State<AddChildpage> {
-  final data = ValueNotifier<ChildInfo?>(null);
+class AddChildpage extends StatelessWidget {
+  const AddChildpage({super.key, required this.bloc, this.childInfo});
+  final SantaListBloc bloc;
+  final ChildInfo? childInfo;
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (context) => SantaListBloc(), child: _Body());
-  }
-
-  void onFabTap() {
-    final bodyState = context.findRootAncestorStateOfType<_BodyState>();
-    if (bodyState == null) return;
-
-    final valited = bodyState.formKey.currentState?.validate() ?? false;
-    if (!valited) return;
-    final childInfo = ChildInfo(
-      name: bodyState.nameController.text,
-      country: bodyState.country,
-      childType: bodyState.childType,
+    return BlocProvider.value(
+      value: bloc,
+      child: _Body(
+        childInfo: childInfo,
+      ),
     );
-    final bloc = context.read<SantaListBloc>();
-    bloc.add(SantaChildAdded(childInfo));
   }
-
-  void onSave(ChildInfo childInfo) {}
 }
 
 class _Body extends StatefulWidget {
   const _Body({
     super.key,
+    required this.childInfo,
   });
-
+  final ChildInfo? childInfo;
   @override
   State<_Body> createState() => _BodyState();
 }
@@ -61,12 +46,22 @@ class _BodyState extends State<_Body> {
   final formKey = GlobalKey<FormState>();
   @override
   void initState() {
+    super.initState();
+
     nameController = TextEditingController();
+    final childInfo = widget.childInfo;
+
+    if (childInfo != null) {
+      nameController.text = childInfo.name;
+      this.country = childInfo.country;
+      childType = childInfo.childType;
+      return;
+    }
+
     final country = CountryService().findByCode('IN');
     if (country != null) {
       this.country = country;
     }
-    super.initState();
   }
 
   @override
@@ -76,6 +71,7 @@ class _BodyState extends State<_Body> {
         title: const Text('Add Child'),
       ),
       floatingActionButton: _DoneFab(
+        label: widget.childInfo == null ? 'Save' : 'Update',
         onSave: onSave,
       ),
       body: Form(
@@ -91,17 +87,9 @@ class _BodyState extends State<_Body> {
               const SizedBox(
                 height: _columnSpacing,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Pick Country'),
-                  FilledButton.tonal(
-                    onPressed: onCountryPick,
-                    child: Text(
-                      country.name,
-                    ),
-                  )
-                ],
+              _PickCountry(
+                country: country,
+                onCountryPick: onCountryPick,
               ),
               const SizedBox(
                 height: _columnSpacing,
@@ -121,14 +109,20 @@ class _BodyState extends State<_Body> {
     final validated = formKey.currentState?.validate() ?? false;
     if (!validated) return;
 
+    final isEdit = widget.childInfo != null;
+    final bloc = context.read<SantaListBloc>();
+    const uuid = Uuid();
+
     final childInfo = ChildInfo(
+      id: isEdit ? widget.childInfo!.id : uuid.v4(),
       name: nameController.text,
       country: country,
       childType: childType,
     );
-    final bloc = context.read<SantaListBloc>();
-    bloc.add(SantaChildAdded(childInfo));
 
+    final event =
+        isEdit ? SantaChildEdited(childInfo) : SantaChildAdded(childInfo);
+    bloc.add(event);
     Navigator.pop(context);
   }
 
@@ -151,15 +145,44 @@ class _BodyState extends State<_Body> {
   }
 }
 
+class _PickCountry extends StatelessWidget {
+  const _PickCountry(
+      {super.key, required this.country, required this.onCountryPick});
+  final Country country;
+  final VoidCallback onCountryPick;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: onCountryPick,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Pick Country'),
+          FilledButton.tonal(
+            onPressed: onCountryPick,
+            child: Text(
+              country.name,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class _DoneFab extends StatelessWidget {
-  const _DoneFab({super.key, required this.onSave});
+  const _DoneFab({super.key, required this.onSave, required this.label});
   final VoidCallback onSave;
+  final String label;
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
       onPressed: onSave,
       icon: const Icon(Icons.save),
-      label: const Text('Save'),
+      label: Text(
+        label,
+      ),
     );
   }
 }

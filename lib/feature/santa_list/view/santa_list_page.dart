@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:santa_list/core/models/models.dart';
 import 'package:santa_list/feature/santa_list/view/add_child_page.dart';
 import 'package:santa_list/feature/santa_list/view/widgets/child_list_tile.dart';
 
@@ -35,29 +36,53 @@ class SantaListView extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Santa children list'),
           ),
-          body: const _ChildrenListView(),
+          body: switch (state) {
+            SantaListEmpty() =>
+              const Center(child: Text('Nothing Added Yet...')),
+            SantaListData() => _ChildrenListView(data: state.childInfo),
+          },
         );
       },
     );
   }
 
   void onChildAddPressed(BuildContext context) {
+    final bloc = context.read<SantaListBloc>();
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddChildpage(),
+        builder: (context) => AddChildpage(bloc: bloc),
       ),
     );
   }
 }
 
 class _ChildrenListView extends StatelessWidget {
-  const _ChildrenListView({super.key});
-
+  const _ChildrenListView({super.key, required this.data});
+  final List<ChildInfo> data;
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: (context, index) => const ChildListTile(),
+    return ListView.separated(
+      itemCount: data.length,
+      padding: const EdgeInsets.all(16),
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
+      itemBuilder: (context, index) => ChildListTile(
+        data: data[index],
+        onTap: () => onTileTap(context, data[index]),
+      ),
+    );
+  }
+
+  void onTileTap(BuildContext context, ChildInfo data) {
+    final bloc = context.read<SantaListBloc>();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddChildpage(
+          bloc: bloc,
+          childInfo: data,
+        ),
+      ),
     );
   }
 }

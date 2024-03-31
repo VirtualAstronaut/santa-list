@@ -14,6 +14,7 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      textCapitalization: TextCapitalization.sentences,
       validator: Utils.validateEmpty,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),

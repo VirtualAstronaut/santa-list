@@ -11,3 +11,11 @@ class SantaChildAdded extends SantaListEvent {
     this.childInfo,
   );
 }
+
+class SantaChildEdited extends SantaListEvent {
+  final ChildInfo childInfo;
+
+  const SantaChildEdited(
+    this.childInfo,
+  );
+}

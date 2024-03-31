@@ -15,9 +15,32 @@ class SantaListBloc extends Bloc<SantaListEvent, SantaListState> {
         }
         SantaListData santaListData = state as SantaListData;
         final list = [
-          ...santaListData.childInfo,
           event.childInfo,
+          ...santaListData.childInfo,
         ];
+        emit(
+          SantaListData(
+            childInfo: list,
+          ),
+        );
+        if (state is SantaListData) {
+          SantaListData santaListData = state as SantaListData;
+          log(santaListData.childInfo.length.toString());
+        }
+      },
+    );
+    on<SantaChildEdited>(
+      (event, emit) {
+        if (state is SantaListEmpty) return;
+
+        SantaListData santaListData = state as SantaListData;
+        final indexOfElement = santaListData.childInfo.indexWhere(
+          (element) => element.id == event.childInfo.id,
+        );
+
+        final list = [...santaListData.childInfo];
+        list[indexOfElement] = event.childInfo;
+
         emit(
           SantaListData(
             childInfo: list,
