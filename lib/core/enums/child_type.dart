@@ -1,0 +1,4 @@
+enum ChildType {
+  naughty,
+  nice,
+}

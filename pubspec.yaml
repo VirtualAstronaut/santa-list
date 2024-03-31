@@ -7,8 +7,10 @@ environment:
   sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
+  country_picker: ^2.0.25
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.5
 
 dev_dependencies:
   flutter_test:

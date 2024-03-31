@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:santa_list/feature/santa_list/view/santa_list_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,12 +10,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+    return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.redAccent.shade200,
       ),
+      home: const SantaListPage(),
     );
   }
 }
