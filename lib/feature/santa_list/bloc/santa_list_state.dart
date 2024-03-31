@@ -11,5 +11,18 @@ final class SantaListEmpty extends SantaListState {
 final class SantaListData extends SantaListState {
   final List<ChildInfo> childInfo;
 
-  SantaListData({required this.childInfo});
+  const SantaListData({required this.childInfo});
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SantaListData && listEquals(childInfo, other.childInfo);
+  }
+
+  @override
+  int get hashCode => childInfo.hashCode;
+
+  @override
+  String toString() {
+    return 'SantaListData(childInfo: $childInfo)';
+  }
 }

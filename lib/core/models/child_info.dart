@@ -14,6 +14,20 @@ class ChildInfo {
     required this.id,
   });
 
+  ChildInfo copyWith({
+    String? name,
+    Country? country,
+    ChildType? childType,
+    String? id,
+  }) {
+    return ChildInfo(
+      name: name ?? this.name,
+      country: country ?? this.country,
+      childType: childType ?? this.childType,
+      id: id ?? this.id,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -26,4 +40,9 @@ class ChildInfo {
 
   @override
   int get hashCode => Object.hash(name, country, childType);
+
+  @override
+  String toString() {
+    return 'ChildInfo(name: $name, country: $country, childType: $childType, id: $id)';
+  }
 }
